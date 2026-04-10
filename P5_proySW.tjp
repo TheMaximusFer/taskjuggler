@@ -5,7 +5,7 @@
  * some elements of it
  */
 
-project pSix "Web Game"  2025-12-15 +5m {
+project pSix "Web Game"  2025-12-15 +7m {
   # Set the default time zone for the project. If not specified, UTC
   # is used.
   timezone "Europe/Paris"
@@ -19,7 +19,7 @@ project pSix "Web Game"  2025-12-15 +5m {
   # the project reports. If not specified, the current day will be
   # used, but this will likely be outside of the project range, so it
   # can't be seen in the reports.
-  now 2026-02-25-13:00
+  now 2026-04-10
   # The currency for all money values is the US Dollar.
   currency "EUR"
 
@@ -67,6 +67,10 @@ resource dev2 "Samantha Müller" {
 }
 resource dev3 "Peter Green" {
   email "kkk@unizar.es"
+}
+resource 897113 "Fernando Pastor" {
+  email "897113@unizar.es"
+  workinghours mon - fri 09:00 - 13:00
 }
 
 # Now we specify the work packages. The whole project is described as
@@ -147,13 +151,69 @@ task WMGame "Web & Mobile Game" {
     }    
   }
 
-  task ttest "Acceptance tests" {
+  task tmobileF "Mobile Front End" {
+    purge chargeset
+    chargeset mFront
+    responsible 897113
+    depends WMGame.tgdesign
+    depends WMGame.tback.tBEd
+    task tmobGUId "Mobile UI Design" {
+      effort 6d
+      allocate 897113, dev3
+      depends WMGame.twebF.tGUId
+    }
+    task tmobDev "Mobile Front End Construction" {
+      effort 16d
+      allocate 897113, dev2
+      depends WMGame.tmobileF.tmobGUId
+      depends WMGame.tback.tbackDev
+      journalentry 2026-04-10 "Integration issue on mobile login flow" {
+        author 897113
+        alert yellow
+        summary "OAuth callback from backend required updates in mobile client routing."
+      }
+    }
+    task tmobTest "Mobile Front End Test" {
+      effort 8d
+      allocate 897113, dev1
+      depends WMGame.tmobileF.tmobDev
+    }
+  }
+
+  task tcloud "Cloud deployment support" {
+    purge chargeset
+    chargeset back
+    responsible dev1
+    depends WMGame.tback.tbackDev
+    task tcloudEval "Cloud provider evaluation" {
+      effort 4d
+      allocate boss, 897113
+      depends WMGame.tback.tlogic
+    }
+    task tcloudPrep "Deployment automation preparation" {
       effort 10d
+      allocate dev1, 897113
+      depends WMGame.tcloud.tcloudEval
+    }
+    task tcloudRollout "Staging rollout and verification" {
+      effort 6d
+      allocate dev1, 897113
+      depends WMGame.tcloud.tcloudPrep
+      depends WMGame.tmobileF.tmobDev
+    }
+  }
+
+  task ttest "Acceptance tests" {
+      effort 12d
+      start 2026-05-15
       allocate boss
       allocate dev2
+      allocate 897113
       actual:effort 20d
-      depends WMGame.twebF
-      depends WMGame.tback
+      depends WMGame.twebF.tFEt
+      depends WMGame.tback.tbackDev
+      depends WMGame.tmobileF.tmobTest
+      depends WMGame.tcloud.tcloudRollout
       }
 
     
@@ -223,6 +283,11 @@ textreport frame "" {
     formats html
     center '<[report id="overview"]>'
   }
+
+  textreport baseline "Baseline Plan" {
+    formats html
+    center '<[report id="overviewPlan"]>'
+  }
   
   textreport "Status" {
     formats html
@@ -263,6 +328,19 @@ taskreport overview "" {
           revenue, chart { ${TaskTip} }
   # For this report we like to have the abbreviated weekday in front
   # of the date. %a is the tag for this.
+  timeformat "%a %Y-%m-%d"
+  loadunit days
+  hideresource @all
+  balance cost rev
+  caption 'All effort values are in man days.'
+}
+
+taskreport overviewPlan "" {
+  scenarios plan
+  headline "Initial Project Plan"
+  columns bsi { title 'WBS' },
+          name, start, end, effort, cost,
+          revenue, chart { ${TaskTip} }
   timeformat "%a %Y-%m-%d"
   loadunit days
   hideresource @all
