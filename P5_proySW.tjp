@@ -68,8 +68,8 @@ resource dev2 "Samantha Müller" {
 resource dev3 "Peter Green" {
   email "kkk@unizar.es"
 }
-resource 897113 "Fernando Pastor" {
-  email "897113@unizar.es"
+resource a897113 "Fernando Pastor" {
+  email "a897113@unizar.es"
   workinghours mon - fri 09:00 - 13:00
 }
 
@@ -154,28 +154,28 @@ task WMGame "Web & Mobile Game" {
   task tmobileF "Mobile Front End" {
     purge chargeset
     chargeset mFront
-    responsible 897113
+    responsible a897113
     depends WMGame.tgdesign
     depends WMGame.tback.tBEd
     task tmobGUId "Mobile UI Design" {
       effort 6d
-      allocate 897113, dev3
+      allocate a897113, dev3
       depends WMGame.twebF.tGUId
     }
     task tmobDev "Mobile Front End Construction" {
       effort 16d
-      allocate 897113, dev2
+      allocate a897113, dev2
       depends WMGame.tmobileF.tmobGUId
       depends WMGame.tback.tbackDev
       journalentry 2026-04-10 "Integration issue on mobile login flow" {
-        author 897113
+        author a897113
         alert yellow
         summary "OAuth callback from backend required updates in mobile client routing."
       }
     }
     task tmobTest "Mobile Front End Test" {
       effort 8d
-      allocate 897113, dev1
+      allocate a897113, dev1
       depends WMGame.tmobileF.tmobDev
     }
   }
@@ -187,17 +187,17 @@ task WMGame "Web & Mobile Game" {
     depends WMGame.tback.tbackDev
     task tcloudEval "Cloud provider evaluation" {
       effort 4d
-      allocate boss, 897113
+      allocate boss, a897113
       depends WMGame.tback.tlogic
     }
     task tcloudPrep "Deployment automation preparation" {
       effort 10d
-      allocate dev1, 897113
+      allocate dev1, a897113
       depends WMGame.tcloud.tcloudEval
     }
     task tcloudRollout "Staging rollout and verification" {
       effort 6d
-      allocate dev1, 897113
+      allocate dev1, a897113
       depends WMGame.tcloud.tcloudPrep
       depends WMGame.tmobileF.tmobDev
     }
@@ -208,7 +208,7 @@ task WMGame "Web & Mobile Game" {
       start 2026-05-15
       allocate boss
       allocate dev2
-      allocate 897113
+      allocate a897113
       actual:effort 20d
       depends WMGame.twebF.tFEt
       depends WMGame.tback.tbackDev
